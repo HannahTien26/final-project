@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>海龜湯故事館</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px;">
+    <h1>🐢 海龜湯故事館</h1>
+
+    <form action="/crawl-soup" method="GET" style="margin-bottom: 20px;">
+        <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 5px; font-size: 16px;">
+            🔄 點擊抓取最新海龜湯資料
+        </button>
+    </form>
+
+    <hr>
+
+    {% if soup_list %}
+        {% for soup in soup_list %}
+            <div style="margin-bottom: 30px; border: 1px solid #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
+                <h3 style="margin-top: 0;">{{ soup.id }}. {{ soup.title }}</h3>
+                <p style="font-size: 16px; line-height: 1.6;"><strong>【湯面（題目）】</strong><br> {{ soup.question }} </p>
+                
+                <details style="margin-top: 15px;">
+                    <summary style="color: #0066cc; cursor: pointer; font-weight: bold;">點我查看【湯底（答案）】</summary>
+                    <p style="color: #cc0000; white-space: pre-wrap; margin-top: 10px; font-size: 16px; line-height: 1.6; background: #fff3f3; padding: 10px; border-left: 4px solid #cc0000;">{{ soup.answer }}</p>
+                </details>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #666;">目前資料庫空空如也，請點擊上方按鈕更新資料！</p>
+    {% endif %}
+</body>
+</html>
