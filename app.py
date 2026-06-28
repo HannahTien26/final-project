@@ -7,33 +7,27 @@ app = Flask(__name__)
 
 def load_soups_from_html():
     soups = []
-    # 這裡確保檔案名稱跟你同學的一樣
     file_path = "my_source.html" 
     
     if not os.path.exists(file_path):
         print(f"找不到 {file_path} 檔案喔！請確認它跟 app.py 放在同一個資料夾。")
         return soups
 
-    # 讀取同學做好的 HTML 檔案
     with open(file_path, "r", encoding="utf-8") as f:
         soup_doc = BeautifulSoup(f, "html.parser")
 
-    # 抓出所有 class 為 soup-item 的區塊
     items = soup_doc.find_all("div", class_="soup-item")
     
     for item in items:
-        # 抓取標題、湯麵、湯底
         title_element = item.find("h2", class_="soup-title")
         question_element = item.find("p", class_="soup-question")
         answer_element = item.find("p", class_="soup-answer")
         
-        # 確保資料都有抓到才放進去
         if title_element and question_element and answer_element:
             title = title_element.text.strip()
             question = question_element.text.strip()
             answer = answer_element.text.strip()
             
-            # 自動判斷分類（1-15題恐怖，16-30題搞笑，31-45題感人）
             try:
                 num = int(title.split(".")[0])
                 if num <= 15:
@@ -43,7 +37,7 @@ def load_soups_from_html():
                 else:
                     tag = "感人"
             except:
-                tag = "全部" # 萬一標題沒有數字，就丟到「全部」
+                tag = "全部" 
 
             soups.append({
                 "tag": tag,
