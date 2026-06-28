@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 style="color: #1d3557;">海龜湯線上題庫</h1>
+  
+  <div style="margin-bottom: 30px; display: flex; gap: 10px;">
+    <a href="/" 
+       style="padding: 8px 16px; text-decoration: none; border-radius: 20px; font-weight: bold;
+              background-color: {% if not current_category %}#1d3557{% else %}#ddd{% endif %}; 
+              color: {% if not current_category %}white{% else %}#333{% endif %};">
+       全部
+    </a>
+    
+    <a href="/?category=恐怖" 
+       style="padding: 8px 16px; text-decoration: none; border-radius: 20px; font-weight: bold;
+              background-color: {% if current_category == '恐怖' %}#e63946{% else %}#ddd{% endif %}; 
+              color: {% if current_category == '恐怖' %}white{% else %}#333{% endif %};">
+       恐怖 
+    </a>
+    
+    <a href="/?category=搞笑" 
+       style="padding: 8px 16px; text-decoration: none; border-radius: 20px; font-weight: bold;
+              background-color: {% if current_category == '搞笑' %}#ffb703{% else %}#ddd{% endif %}; 
+              color: {% if current_category == '搞笑' %}white{% else %}#333{% endif %};">
+       搞笑 
+    </a>
+    
+    <a href="/?category=感人" 
+       style="padding: 8px 16px; text-decoration: none; border-radius: 20px; font-weight: bold;
+              background-color: {% if current_category == '感人' %}#457b9d{% else %}#ddd{% endif %}; 
+              color: {% if current_category == '感人' %}white{% else %}#333{% endif %};">
+       感人 
+    </a>
+  </div>
+
+  <ul style="list-style: none; padding: 0;">
+    {% for soup in soups %}
+      <li onclick="toggleAnswer(this)" style="margin-bottom: 20px; padding: 20px; background-color: #fdfaf6; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s;">
+        
+        <span style="font-size: 12px; background: #e0e0e0; padding: 3px 8px; border-radius: 10px; color: #555;">
+          {{ soup.tag }}
+        </span>
+        
+        <h3 style="margin: 10px 0 5px 0; color: black;">{{ soup.title }}</h3>
+        
+        <p style="color: #444; line-height: 1.6; margin-bottom: 0;">{{ soup.content }}</p>
+        
+        <div class="answer" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc; color: #d62828;">
+          <strong>湯底真相：</strong><br>
+          {{ soup.answer }}
+        </div>
+        
+      </li>
+    {% else %}
+      <p style="color: #999; text-align: center; margin-top: 40px;">目前這個分類還沒有題目喔！</p>
+    {% endfor %}
+  </ul>
+
+  <script>
+    function toggleAnswer(card) {
+      const answerDiv = card.querySelector('.answer');
+      
+      if (answerDiv.style.display === 'none') {
+        answerDiv.style.display = 'block';
+        card.style.backgroundColor = '#f0f4f8'; 
+      } else {
+        answerDiv.style.display = 'none';
+        card.style.backgroundColor = '#fdfaf6'; 
+      }
+    }
+  </script>
+{% endblock %}
