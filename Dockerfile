@@ -3,4 +3,4 @@ RUN apt-get update && apt-get install -y chromium chromium-driver
 COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
-CMD ["gunicorn", "app:app"]
+CMD ["python", "my_crawler.py"]
