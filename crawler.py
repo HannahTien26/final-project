@@ -4,7 +4,7 @@ import psycopg2
 import requests
 from bs4 import BeautifulSoup
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.environ.get("postgresql://soup_admin:Bxg6dZlX03mv6RQNCBAHR0UmperDQAaW@dpg-d8vvad19rddc73ap7lf0-a.singapore-postgres.render.com/soup_db_2l2k")
 
 def clean_and_split_ptt_content(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
