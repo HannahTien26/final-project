@@ -87,3 +87,6 @@ def crawl_ptt_to_db():
 
 if __name__ == "__main__":
     crawl_ptt_to_db()
+    while True:
+        time.sleep(43200) 
+        crawl_ptt_to_db() 
