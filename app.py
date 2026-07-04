@@ -15,7 +15,7 @@ def load_soups_from_db():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        cur.execute('SELECT title, content, answer FROM turtle_soups;')
+        cur.execute('SELECT title, question, answer FROM turtle_soups;')
         rows = cur.fetchall()
         
         cur.close()
