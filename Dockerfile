@@ -1,10 +1,6 @@
-FROM mcr.microsoft.com/playwright/python:v1.49.0-noble
-
+FROM python:3.9-slim
+RUN apt-get update && apt-get install -y chromium chromium-driver
+COPY . /app
 WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-CMD ["python", "crawler.py"]
+RUN pip install -r requirements.txt
+CMD ["gunicorn", "app:app"]
