@@ -4,7 +4,7 @@ import psycopg2
 import requests
 from bs4 import BeautifulSoup
 
-DATABASE_URL = os.environ.get("postgresql://soup_admin:Bxg6dZlX03mv6RQNCBAHR0UmperDQAaW@dpg-d8vvad19rddc73ap7lf0-a.singapore-postgres.render.com/soup_db_2l2k")
+DATABASE_URL = "postgresql://soup_admin:Bxg6dZlX03mv6RQNCBAHR0UmperDQAaW@dpg-d8vvad19rddc73ap7lf0-a.singapore-postgres.render.com/soup_db_2l2k"
 
 def clean_and_split_ptt_content(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -39,11 +39,17 @@ def clean_and_split_ptt_content(html_content):
 
 def crawl_ptt_to_db():
     url = "https://www.ptt.cc/bbs/TurtleSoup/index.html"
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
     
-    response = requests.get(url, headers=headers)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'accept-language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7'
+    }
+    cookies = {'over18': '1'}
+    
+    response = requests.get(url, headers=headers, cookies=cookies)
     if response.status_code != 200:
-        print("無法連線到 PTT 海龜湯版")
+        print(f"無法連線到 PTT 海龜湯版，狀態碼：{response.status_code}")
         return
         
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -64,7 +70,7 @@ def crawl_ptt_to_db():
         if "刪除" in title:
             continue
             
-        detail_res = requests.get(article_url, headers=headers)
+        detail_res = requests.get(article_url, headers=headers, cookies=cookies)
         if detail_res.status_code == 200:
             question, answer = clean_and_split_ptt_content(detail_res.text)
             
@@ -87,6 +93,3 @@ def crawl_ptt_to_db():
 
 if __name__ == "__main__":
     crawl_ptt_to_db()
-    while True:
-        time.sleep(43200) 
-        crawl_ptt_to_db() 
