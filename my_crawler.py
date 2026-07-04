@@ -4,7 +4,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import TurtleSoup 
+from models import TurtleSoup
+
+db_url = os.environ.get("postgresql://soup_admin:Bxg6dZlX03mv6RQNCBAHR0UmperDQAaW@dpg-d8vvad19rddc73ap7lf0-a.singapore-postgres.render.com/soup_db_2l2k")
+engine = create_engine(db_url)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 def run_spider():
     options = Options()
@@ -16,26 +21,20 @@ def run_spider():
     driver.get("https://www.ptt.cc/bbs/TurtleSoup/index.html")
     
     posts = driver.find_elements(By.CLASS_NAME, "r-ent")
-    links = [post.find_element(By.TAG_NAME, "a").get_attribute("href") for post in posts]
     
-    engine = create_engine(os.environ.get("DATABASE_URL"))
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    
-    for link in links[:10]:
-        driver.get(link)
-        content = driver.find_element(By.ID, "main-content").text
-        
-        parts = content.split("解答")
-        title = parts[0].split("\n")[0]
-        answer = parts[1] if len(parts) > 1 else "無"
-        
-        new_entry = TurtleSoup(title=title, content=answer)
-        session.add(new_entry)
-        
-    session.commit()
-    session.close()
+    for post in posts:
+        try:
+            title = post.find_element(By.CLASS_NAME, "title").text
+            
+            new_data = TurtleSoup(title=title)
+            session.add(new_data)
+            session.commit()
+            
+        except:
+            continue
+            
     driver.quit()
+    session.close()
 
 if __name__ == "__main__":
     run_spider()
