@@ -1,32 +1,30 @@
 from flask import Flask, render_template, request
 import random
-from bs4 import BeautifulSoup
 import os
+import psycopg2 
 
 app = Flask(__name__)
 
-def load_soups_from_html():
+def get_db_connection():
+    db_url = os.environ.get('DATABASE_URL', 'postgresql://soup_admin:Bxg6dZlX03mv6RQNCBAHR0UmperDQAaW@dpg-d8vvad19rddc73ap7lf0-a.singapore-postgres.render.com/soup_db_2l2k')
+    return psycopg2.connect(db_url)
+
+def load_soups_from_db():
     soups = []
-    file_path = "my_source.html" 
-    
-    if not os.path.exists(file_path):
-        print(f"找不到 {file_path} 檔案喔！請確認它跟 app.py 放在同一個資料夾。")
-        return soups
-
-    with open(file_path, "r", encoding="utf-8") as f:
-        soup_doc = BeautifulSoup(f, "html.parser")
-
-    items = soup_doc.find_all("div", class_="soup-item")
-    
-    for item in items:
-        title_element = item.find("h2", class_="soup-title")
-        question_element = item.find("p", class_="soup-question")
-        answer_element = item.find("p", class_="soup-answer")
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
         
-        if title_element and question_element and answer_element:
-            title = title_element.text.strip()
-            question = question_element.text.strip()
-            answer = answer_element.text.strip()
+        cur.execute('SELECT title, content, answer FROM turtle-soup-db;')
+        rows = cur.fetchall()
+        
+        cur.close()
+        conn.close()
+
+        for row in rows:
+            title = row[0]
+            question = row[1]
+            answer = row[2]
             
             try:
                 num = int(title.split(".")[0])
@@ -45,12 +43,14 @@ def load_soups_from_html():
                 "content": question,
                 "answer": answer
             })
+    except Exception as e:
+        print(f"資料庫連線或讀取失敗啦！錯誤訊息：{e}")
         
     return soups
 
 @app.route("/")
 def home():
-    all_soups = load_soups_from_html()
+    all_soups = load_soups_from_db()
     selected_category = request.args.get("category")
     
     if selected_category:
@@ -66,13 +66,13 @@ def home():
 
 @app.route("/random")
 def random_soup():
-    all_soups = load_soups_from_html()
+    all_soups = load_soups_from_db()
     
     if all_soups:
         lucky_soup = random.choice(all_soups)
         return render_template("index.html", soups=[lucky_soup], current_category="隨機")
     else:
-        return "題庫還沒準備好喔！"
+        return "題庫還沒準備好喔！請確認資料庫有連上且有資料。"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
