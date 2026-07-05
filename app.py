@@ -1,11 +1,17 @@
-from flask import Flask, jsonify
+import os
 import psycopg2
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
 def get_db_connection():
-    # 這行程式碼會自動去抓你剛剛在 Render 設定的 DATABASE_URL
-    database_url = os.environ.get('postgresql://soup_admin:Bxg6dZlX03mv6RQNCBAHR0UmperDQAaW@dpg-d8vvad19rddc73ap7lf0-a.singapore-postgres.render.com/soup_db_2l2k')
+    # 這是正確的用法：去抓取環境變數中名為 'DATABASE_URL' 的值
+    database_url = os.environ.get('DATABASE_URL')
+    
+    # 如果 DATABASE_URL 沒有設定，這裡會報錯提醒你
+    if not database_url:
+        raise Exception("請在 Render 的 Environment 中設定 DATABASE_URL 變數")
+        
     return psycopg2.connect(database_url)
 
 @app.route('/')
@@ -16,28 +22,24 @@ def home():
 def get_questions():
     conn = None
     try:
-        # 嘗試連線
         conn = get_db_connection()
         cur = conn.cursor()
         
         # 執行查詢
         cur.execute('SELECT title, raw_text FROM haiguitang_data;') 
         rows = cur.fetchall()
-        
-        # 關閉 cursor
         cur.close()
+        conn.close()
         
         # 轉換資料
         data = [{'title': row[0], 'raw_text': row[1]} for row in rows]
-        
-        # 成功後回傳
         return jsonify(data)
         
     except Exception as e:
-        # 發生任何錯誤時，回傳錯誤原因，並且確保連線已關閉
         if conn:
             conn.close()
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # 雲端上 Render 會自動透過 Gunicorn 啟動，這裡的 debug=True 只在本地測試用
+    app.run()
