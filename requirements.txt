@@ -1,6 +1,2 @@
-flask
-sqlalchemy
-psycopg2-binary
-selenium
-webdriver-manager
-gunicorn
+requests
+beautifulsoup4
