@@ -15,24 +15,26 @@ def load_soups_from_db():
         conn = get_db_connection()
         cur = conn.cursor()
         
-        cur.execute('SELECT id, title, question, answer FROM turtle_soups;')
+        cur.execute('SELECT title, soup_face, soup_bottom FROM haiguitang_data;')
         rows = cur.fetchall()
         
         cur.close()
         conn.close()
 
         for row in rows:
-            soup_id = row[0]
-            title = row[1]
-            question = row[2]
-            answer = row[3]
+            title = row[0]
+            question = row[1]
+            answer = row[2]
             
-            if soup_id == 1 or soup_id == 2:
+            if not question or not answer:
+                continue
+            
+            if "怎么玩" in title:
                 continue
 
             soups.append({
                 "title": title,
-                "content": question,
+                "content": question, 
                 "answer": answer
             })
             
