@@ -15,7 +15,6 @@ def load_soups_from_db():
         conn = get_db_connection()
         cur = conn.cursor()
         
-        # 抓取 id, title, question, answer (注意資料表名稱是 turtle_soups)
         cur.execute('SELECT id, title, question, answer FROM turtle_soups;')
         rows = cur.fetchall()
         
@@ -28,13 +27,12 @@ def load_soups_from_db():
             question = row[2]
             answer = row[3]
             
-            # 關鍵：直接跳過前兩個重複的雷包資料
             if soup_id == 1 or soup_id == 2:
                 continue
 
             soups.append({
                 "title": title,
-                "content": question, # 這裡維持 content 讓前端 HTML 讀取
+                "content": question,
                 "answer": answer
             })
             
@@ -46,7 +44,6 @@ def load_soups_from_db():
 @app.route("/")
 def home():
     all_soups = load_soups_from_db()
-    # 已經沒有分類了，直接把全部 45 碗湯送給前端
     return render_template("index.html", soups=all_soups)
 
 @app.route("/random")
