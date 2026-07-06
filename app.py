@@ -15,34 +15,29 @@ def load_soups_from_db():
         conn = get_db_connection()
         cur = conn.cursor()
         
-        cur.execute('SELECT title, content, answer FROM turtle-soup-db;')
+        # 抓取 id, title, question, answer (注意資料表名稱是 turtle_soups)
+        cur.execute('SELECT id, title, question, answer FROM turtle_soups;')
         rows = cur.fetchall()
         
         cur.close()
         conn.close()
 
         for row in rows:
-            title = row[0]
-            question = row[1]
-            answer = row[2]
+            soup_id = row[0]
+            title = row[1]
+            question = row[2]
+            answer = row[3]
             
-            try:
-                num = int(title.split(".")[0])
-                if num <= 15:
-                    tag = "恐怖"
-                elif num <= 30:
-                    tag = "搞笑"
-                else:
-                    tag = "感人"
-            except:
-                tag = "全部" 
+            # 關鍵：直接跳過前兩個重複的雷包資料
+            if soup_id == 1 or soup_id == 2:
+                continue
 
             soups.append({
-                "tag": tag,
                 "title": title,
-                "content": question,
+                "content": question, # 這裡維持 content 讓前端 HTML 讀取
                 "answer": answer
             })
+            
     except Exception as e:
         print(f"資料庫連線或讀取失敗啦！錯誤訊息：{e}")
         
@@ -51,18 +46,8 @@ def load_soups_from_db():
 @app.route("/")
 def home():
     all_soups = load_soups_from_db()
-    selected_category = request.args.get("category")
-    
-    if selected_category:
-        filtered_soups = [soup for soup in all_soups if soup.get("tag") == selected_category]
-    else:
-        filtered_soups = all_soups
-        
-    return render_template(
-        "index.html", 
-        soups=filtered_soups, 
-        current_category=selected_category
-    )
+    # 已經沒有分類了，直接把全部 45 碗湯送給前端
+    return render_template("index.html", soups=all_soups)
 
 @app.route("/random")
 def random_soup():
@@ -70,7 +55,7 @@ def random_soup():
     
     if all_soups:
         lucky_soup = random.choice(all_soups)
-        return render_template("index.html", soups=[lucky_soup], current_category="隨機")
+        return render_template("index.html", soups=[lucky_soup])
     else:
         return "題庫還沒準備好喔！請確認資料庫有連上且有資料。"
 
