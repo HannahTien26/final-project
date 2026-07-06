@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 style="color: #1d3557; margin-bottom: 30px;">海龜湯線上題庫</h1>
+
+  <ul style="list-style: none; padding: 0;">
+    {% for soup in soups %}
+      <li onclick="toggleAnswer(this)" style="margin-bottom: 20px; padding: 20px; background-color: #fdfaf6; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s;">
+        
+        <h3 style="margin: 0 0 5px 0; color: black;">{{ soup.title }}</h3>
+        
+        <p style="color: #444; line-height: 1.6; margin-bottom: 0;">{{ soup.content }}</p>
+        
+        <div class="answer" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc; color: #d62828;">
+          <strong>湯底真相：</strong><br>
+          {{ soup.answer }}
+        </div>
+        
+      </li>
+    {% else %}
+      <p style="color: #999; text-align: center; margin-top: 40px;">目前題庫還沒有題目喔！</p>
+    {% endfor %}
+  </ul>
+
+  <script>
+    function toggleAnswer(card) {
+      const answerDiv = card.querySelector('.answer');
+      
+      if (answerDiv.style.display === 'none') {
+        answerDiv.style.display = 'block';
+        card.style.backgroundColor = '#f0f4f8'; 
+      } else {
+        answerDiv.style.display = 'none';
+        card.style.backgroundColor = '#fdfaf6'; 
+      }
+    }
+  </script>
+{% endblock %}
