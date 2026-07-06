@@ -28,15 +28,16 @@ def load_soups_from_db():
             
             if not question or not answer:
                 continue
-            
             if "怎么玩" in title:
                 continue
 
             soups.append({
                 "title": title,
-                "content": question, 
+                "content": question,
                 "answer": answer
             })
+            
+        soups = soups[:45]
             
     except Exception as e:
         print(f"資料庫連線或讀取失敗啦！錯誤訊息：{e}")
