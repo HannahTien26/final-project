@@ -1,4 +1,0 @@
-cd final-project
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python crawler.py
